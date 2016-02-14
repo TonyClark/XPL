@@ -231,8 +231,10 @@ public class Context extends Value {
 			}
 			sin.close();
 		} catch (FileNotFoundException e) {
+			System.out.println("read file: " + name);
 			e.printStackTrace();
 		} catch (IOException e) {
+			System.out.println("read file: " + name);
 			e.printStackTrace();
 		}
 		return new StringSource(s);
