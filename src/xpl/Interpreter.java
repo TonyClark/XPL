@@ -1,24 +1,30 @@
 package xpl;
 
-import machine.Machine;
-import modules.ModuleBinding;
-import values.Record;
-import values.Value;
+import java.util.Hashtable;
 
 import commands.Command;
-import commands.Quit;
-
 import context.Context;
 import context.TopLevel;
 import env.Env;
-import exp.Apply;
 import exp.Exp;
 import exp.Import;
-import exp.Str;
 import grammar.Call;
 import grammar.Grammar;
+import machine.Machine;
+import values.Record;
+import values.Value;
 
 public class Interpreter {
+
+	// This class provides an entry point to a top-level interpreter for XPL and
+	// some
+	// useful language loading operations...
+
+	// A cache of grammars for languages in the case that the same language is
+	// used
+	// multiple times...
+
+	static Hashtable<String, Grammar> languages = new Hashtable<String, Grammar>();
 
 	public static void main(String[] args) {
 		Env<String, Value> env = Value.builtinEnv;
@@ -49,18 +55,25 @@ public class Interpreter {
 		System.out.println("...terminated");
 	}
 
-	public static Object readFile(String languagePath, String languageName, String filePath) {
+	public static Object readFile(String languagePath, String languageName, String filePath, String startNT, Exp... args) {
 		// Call this to read a file in a given language. It assumes that xPL needs
 		// to be read first, then the grammar for the language and then the file...
-		Env<String, Value> env = Value.builtinEnv;
-		Machine machine = new Machine(null, env, new TopLevel(System.in), 0, null, 0);
-		XPL.XPL = (Grammar) XPL.XPL.eval(machine);
-		Record xpl = Import.getFile("../xpl/src/xpl/xpl.xpl");
-		XPL.setXPL((Grammar) xpl.dot("XPL"));
-		Grammar grammar = readLanguage(machine, languagePath, languageName);
-		//grammar.setDebug(true);
-		machine = new Machine(grammar, Value.builtinEnv, Context.readFile(filePath), 0, null, 0);
-		machine.pushInstr(new Call(languageName));
+		Grammar grammar = null;
+		if (languages.containsKey(languageName))
+			grammar = languages.get(languageName);
+		else {
+			Env<String, Value> env = Value.builtinEnv;
+			Machine machine = new Machine(null, env, new TopLevel(System.in), 0, null, 0);
+			XPL.XPL = (Grammar) XPL.XPL.eval(machine);
+			Record xpl = Import.getFile("../xpl/src/xpl/xpl.xpl");
+			XPL.setXPL((Grammar) xpl.dot("XPL"));
+			grammar = readLanguage(machine, languagePath, languageName);
+			languages.put(languageName, grammar);
+		}
+		// grammar.setDebug(true);
+		Machine machine = new Machine(grammar, Value.builtinEnv, Context.readFile(filePath), 0, null, 0);
+		machine.pushInstr(new Call(startNT, args));
+		Machine.reset();
 		long start = System.currentTimeMillis();
 		System.out.print("[" + filePath);
 		Value value = machine.run();
