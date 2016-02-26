@@ -98,7 +98,7 @@ xplBase(exp,extension) = {
   fieldPattern      -> n=name whitespace '=' p=Pattern {'patterns.Field'(n,p)};
   cnstrPattern      -> n=name whitespace '(' ps=patterns whitespace ')' {'patterns.Cnstr'(n,ps)};
   keyWord           -> key not([97,122] | [65,90]);
-  key               -> 'EOF' | 'thunk' | 'not' | 'and' | 'or' | 'when' | 'case' | 'module' | 'export' | 'import' | 'true' | 'false' | 'fun' | 'let' | 'in' | 'letrec' | 'if' | 'then' | 'else';
+  key               -> 'EOF' | 'thunk' | 'not' | 'and' | 'or' | 'when' | 'case' | 'module' | 'export' | 'import' | 'true' | 'false' | 'fun' | 'let' | 'in' | 'letrec' | 'if' | 'then' | 'else' | 'SKIPWHITE';
   name              -> whitespace not(keyWord) c=alphaChar chars=(alphaChar | numChar)* ! {'values.Str'(c:chars)};
   grammar           -> '{' rs=rules '}' ! {'grammar.Grammar'('',rs)};
   rule              -> n=name as=ruleArgs '->' b=pTerm {'grammar.Rule'(n,['grammar.Body'(as,b)])};
@@ -111,7 +111,7 @@ xplBase(exp,extension) = {
   repeat            -> x=star ! {x} | x=plus ! {x} | x=pAtom ! {x};
   star              -> a=pAtom '*' {'grammar.Star'(a)};
   plus              -> a=pAtom '+' {'grammar.Plus'(a)};
-  pAtom             -> endOfInput | cut | pred | charCode | pDelay | lDelay | notTerm | call | eCall | term | range | dot | action | '(' a=pTerm ')' {a};
+  pAtom             -> endOfInput | cut | pred | charCode | pDelay | lDelay | notTerm | call | eCall | term | range | dot | action | skip | '(' a=pTerm ')' {a};
   cut               -> '!' {'grammar.Cut'()};
   pDelay            -> 'PDELAY' '(' start=string ',' end=string ',' g=exp ')' {'grammar.PDelay'(start,end,g)};
   lDelay            -> 'LDELAY' '(' start=string ',' end=string ',' g=exp ')' {'grammar.LDelay'(start,end,g)};
@@ -129,6 +129,7 @@ xplBase(exp,extension) = {
   charLiteral       -> 39 x=. 39 {'grammar.Char'(x)};
   charX             -> 39 x=. 39 {x};
   endOfInput        -> 'EOF' {'grammar.EOF'()};
+  skip              -> 'SKIPWHITE' '(' line=string ',' start=string ',' end=string ')' { 'grammar.SkipWhite'(line,start,end) };
   action            -> '{[]}' ! { 'grammar.Const'('values.List'([])) } | '{' e=exp '}' {'grammar.Action'(e)}
 }
 
