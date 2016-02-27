@@ -39,6 +39,9 @@ public class SkipWhite extends PTerm {
 			else if (machine.hasPrefix(start)) {
 				while (!machine.EOF() && !machine.hasPrefix(end))
 					machine.consume();
+				for (int i = 0; i < end.length(); i++)
+					machine.consume();
+				
 			}
 			machine.skipWhiteSpace();
 		}
