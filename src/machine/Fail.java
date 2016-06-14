@@ -14,22 +14,25 @@ import grammar.Grammar;
 @BoaConstructor(fields = { "succ", "grammar", "code", "env", "text", "textPtr", "indent" })
 public class Fail extends Printable {
 
-	public Succ					succ;
-	public Grammar				grammar;
-	public Stack<Instr>			code;
+	public Succ								succ;
+	public Grammar						grammar;
+	public Stack<Instr>				code;
 	public Env<String, Value>	env;
-	public Stack<Value>			values;
-	public CharSource			text;
-	public int					textPtr;
-	public int					indent;
+	public Stack<Value>				values;
+	public Stack<Integer>			lines;
+	public CharSource					text;
+	public int								textPtr;
+	public int								indent;
 
-	public Fail(Succ succ, Grammar grammar, Stack<Instr> code, Env<String, Value> env, Stack<Value> values, CharSource text, int textPtr, int indent) {
+	public Fail(Succ succ, Grammar grammar, Stack<Instr> code, Env<String, Value> env, Stack<Value> values, Stack<Integer> lines, CharSource text, int textPtr,
+			int indent) {
 		super();
 		this.succ = succ;
 		this.grammar = grammar;
 		this.code = code;
 		this.env = env;
 		this.values = values;
+		this.lines = lines;
 		this.text = text;
 		this.textPtr = textPtr;
 		this.indent = indent;
@@ -37,6 +40,14 @@ public class Fail extends Printable {
 
 	public Stack<Value> getValues() {
 		return values;
+	}
+
+	public Stack<Integer> getLines() {
+		return lines;
+	}
+
+	public void setLines(Stack<Integer> lines) {
+		this.lines = lines;
 	}
 
 	public void setValues(Stack<Value> values) {

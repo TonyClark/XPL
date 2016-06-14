@@ -7,6 +7,7 @@ import values.Builtin;
 import values.Closure;
 import values.JavaClass;
 import values.JavaObject;
+import values.Located;
 import values.Str;
 import values.Value;
 import context.Context;
@@ -40,8 +41,7 @@ public class Apply extends Exp {
 			return applyBuiltin((Builtin) v, context);
 		else if (v instanceof JavaClass)
 			return applyClass(((JavaClass) v).getClass_(), context);
-		else
-			throw new Error("Illegal operator " + v);
+		else throw new Error("Illegal operator " + v);
 	}
 
 	private Value applyBuiltin(Builtin b, Context context) {
@@ -95,38 +95,42 @@ public class Apply extends Exp {
 				} catch (NoSuchFieldException e1) {
 					e1.printStackTrace();
 				} catch (Exception x) {
-          System.out.println("cannot set " + name + " to " + value);
-        }
+					System.out.println("cannot set " + name + " to " + value);
+				}
 			}
+		}
+		if (o instanceof Located) {
+			Located l = (Located) o;
+			if (l.getLine() == -1) l.setLine(context.getLine());
 		}
 		if (Value.class.isAssignableFrom(o.getClass()))
 			return (Value) o;
-		else
-			return new JavaObject(o);
+		else return new JavaObject(o);
 	}
 
 	public Value applyClosure(Closure c, Context context) {
-	  if(operands.length == c.getArgs().length) {
-		Context newContext = c.context.copy();
-		for (int i = 0; i < operands.length; i++)
-			newContext.bind(c.getArgs()[i], operands[i].eval(context));
-		//System.out.println("Apply: " + c.getBody() + " in " + newContext.getEnv());
-		return c.getBody().eval(newContext);
-	  } else throw new Error("closure with body " + c.getBody() + " expects args " + Arrays.toString(c.getArgs()) + " but was supplied with " + Arrays.toString(operands));
+		if (operands.length == c.getArgs().length) {
+			Context newContext = c.context.copy();
+			for (int i = 0; i < operands.length; i++)
+				newContext.bind(c.getArgs()[i], operands[i].eval(context));
+			// System.out.println("Apply: " + c.getBody() + " in " +
+			// newContext.getEnv());
+			return c.getBody().eval(newContext);
+		} else throw new Error(
+				"closure with body " + c.getBody() + " expects args " + Arrays.toString(c.getArgs()) + " but was supplied with " + Arrays.toString(operands));
 	}
 
 	public String pprint(int opPrec) {
-		if(opPrec <= APPOP)
+		if (opPrec <= APPOP)
 			return "(" + operator.pprint(APPOP) + pprintArgs() + ")";
 		else return operator.pprint(APPOP) + pprintArgs();
 	}
-	
+
 	public String pprintArgs() {
 		String s = "(";
-		for(Exp arg : operands) {
+		for (Exp arg : operands) {
 			s = s + arg.pprint(MAXOP);
-			if(arg != operands[operands.length-1])
-				s = s + ",";
+			if (arg != operands[operands.length - 1]) s = s + ",";
 		}
 		return s + ")";
 	}

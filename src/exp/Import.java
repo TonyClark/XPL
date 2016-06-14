@@ -1,13 +1,15 @@
 package exp;
 
+import java.util.Stack;
+
+import context.Context;
+import grammar.Call;
+import grammar.Grammar;
 import machine.Machine;
 import modules.ModuleBinding;
 import values.Record;
 import values.Value;
 import xpl.XPL;
-import context.Context;
-import grammar.Call;
-import grammar.Grammar;
 
 @BoaConstructor(fields = { "packages", "body" })
 public class Import extends Exp {
@@ -36,10 +38,8 @@ public class Import extends Exp {
 	}
 
 	public static Record getRecord(Value value) {
-		if (value instanceof values.Str)
-			return getFile((values.Str) value);
-		if (value instanceof Record)
-			return (Record) value;
+		if (value instanceof values.Str) return getFile((values.Str) value);
+		if (value instanceof Record) return (Record) value;
 		throw new Error("Cannot import " + value);
 	}
 
@@ -47,12 +47,12 @@ public class Import extends Exp {
 		String name = str.value;
 		return getFile(name);
 	}
-	
+
 	public static Record getFile(String name) {
-		Machine machine = new Machine(null, Value.builtinEnv, Context.readFile(name), 0, null,0);
-		Grammar grammar = (Grammar) XPL.XPL; 
+		Machine machine = new Machine(null, Value.builtinEnv, new Stack<Integer>(), Context.readFile(name), 0, null, 0);
+		Grammar grammar = (Grammar) XPL.XPL;
 		machine.setGrammar(grammar);
-		machine.pushInstr(new Call("file",new Apply("exp.BindingNameLiteral",new Str(name))));
+		machine.pushInstr(new Call("file", new Apply("exp.BindingNameLiteral", new Str(name))));
 		long start = System.currentTimeMillis();
 		System.out.print("[" + name);
 		Value value = machine.run();
@@ -60,16 +60,14 @@ public class Import extends Exp {
 		if (machine.isOk()) {
 			ModuleBinding b = (ModuleBinding) value;
 			return (Record) b.getValue().eval(machine);
-		} else
-			throw new Error(machine.getError());
+		} else throw new Error(machine.getError());
 	}
 
 	public String pprint(int opPrec) {
 		String s = "import ";
-		for(Exp e : packages) {
+		for (Exp e : packages) {
 			s = s + e.pprint(MAXOP);
-			if(e != packages[packages.length-1])
-				s = s + ",";
+			if (e != packages[packages.length - 1]) s = s + ",";
 		}
 		return s + "}";
 	}

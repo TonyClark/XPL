@@ -15,7 +15,7 @@ import grammar.Seq;
 public class PClosure extends Exp {
 
 	String	text;
-	Exp		grammar;
+	Exp			grammar;
 
 	public PClosure(String text, Exp grammar) {
 		super();
@@ -26,13 +26,12 @@ public class PClosure extends Exp {
 	public Value eval(Context evalContext) {
 		Grammar g = (Grammar) grammar.eval(evalContext);
 		Machine.reset();
-		Machine machine = new Machine(g, evalContext.getEnv(), new StringSource(text), 0, null, 0);
+		Machine machine = new Machine(g, evalContext.getEnv(), (java.util.Stack<Integer>) evalContext.getLines().clone(), new StringSource(text), 0, null, 0);
 		machine.pushInstr(new Seq(new Bind(new patterns.Var("x"), new Call(g.start)), new EOF(), new Action(new Var("x"))));
 		Value value = machine.run();
 		if (machine.isOk())
 			return value.send("eval", new Value[] { evalContext });
-		else
-			throw new Error(machine.getError());
+		else throw new Error(machine.getError());
 	}
 
 	public String pprint(int opPrec) {

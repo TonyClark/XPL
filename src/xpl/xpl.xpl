@@ -111,7 +111,7 @@ xplBase(exp,extension) = {
   repeat            -> x=star ! {x} | x=plus ! {x} | x=pAtom ! {x};
   star              -> a=pAtom '*' {'grammar.Star'(a)};
   plus              -> a=pAtom '+' {'grammar.Plus'(a)};
-  pAtom             -> endOfInput | cut | pred | charCode | pDelay | lDelay | notTerm | call | eCall | term | range | dot | action | skip | '(' a=pTerm ')' {a};
+  pAtom             -> endOfInput | cut | pred | charCode | pDelay | lDelay | notTerm | call | eCall | term | range | dot | action | skip | pushLine | '(' a=pTerm ')' {a};
   cut               -> '!' {'grammar.Cut'()};
   pDelay            -> 'PDELAY' '(' start=string ',' end=string ',' g=exp ')' {'grammar.PDelay'(start,end,g)};
   lDelay            -> 'LDELAY' '(' start=string ',' end=string ',' g=exp ')' {'grammar.LDelay'(start,end,g)};
@@ -130,6 +130,7 @@ xplBase(exp,extension) = {
   charX             -> 39 x=. 39 {x};
   endOfInput        -> 'EOF' {'grammar.EOF'()};
   skip              -> 'SKIPWHITE' '(' line=string ',' start=string ',' end=string ')' { 'grammar.SkipWhite'(line,start,end) };
+  pushLine          -> '[[' t=pTerm ']]' { 'grammar.PushLine'(t) };
   action            -> '{[]}' ! { 'grammar.Const'('values.List'([])) } | '{' e=exp '}' {'grammar.Action'(e)}
 }
 

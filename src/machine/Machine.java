@@ -24,8 +24,8 @@ public class Machine extends Context {
 	private int						numberOfInstrs	= 0;
 	private int						numberOfCalls		= 0;
 
-	public Machine(Grammar grammar, Env<String, Value> env, CharSource text, int textPtr, Value value, int indent) {
-		super(grammar, env, text, textPtr, value, indent);
+	public Machine(Grammar grammar, Env<String, Value> env, Stack<Integer> stack, CharSource text, int textPtr, Value value, int indent) {
+		super(grammar, env, stack, text, textPtr, value, indent);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -34,7 +34,7 @@ public class Machine extends Context {
 				getIndent());
 		Stack<Instr> code = new Stack<Instr>();
 		code.push(instr);
-		fails.push(new Fail(succ, grammar, code, env, (Stack<Value>) values.clone(), getText(), getTextPtr(), getIndent()));
+		fails.push(new Fail(succ, grammar, code, env, (Stack<Value>) values.clone(), (Stack<Integer>) getLines().clone(), getText(), getTextPtr(), getIndent()));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -43,7 +43,7 @@ public class Machine extends Context {
 		Succ succ = new Succ(succCode, (Stack<Fail>) getCut().clone(), getSucc(), getGrammar(), getEnv(), (Stack<Value>) values.clone(), getIndent() - 2);
 		Stack<Instr> code = new Stack<Instr>();
 		code.push(instr);
-		fails.push(new Fail(succ, grammar, code, env, (Stack<Value>) values.clone(), getText(), getTextPtr(), getIndent()));
+		fails.push(new Fail(succ, grammar, code, env, (Stack<Value>) values.clone(), (Stack<Integer>) getLines().clone(), getText(), getTextPtr(), getIndent()));
 	}
 
 	public boolean canFail() {
@@ -54,14 +54,16 @@ public class Machine extends Context {
 	public void choice() {
 		Stack<Value> values = (Stack<Value>) getValues().clone();
 		values.push(null);
-		fails.push(new Fail(succ, getGrammar(), (Stack<Instr>) code.clone(), getEnv(), values, getText(), getTextPtr(), getIndent()));
+		fails.push(
+				new Fail(succ, getGrammar(), (Stack<Instr>) code.clone(), getEnv(), values, (Stack<Integer>) getLines().clone(), getText(), getTextPtr(), getIndent()));
 	}
 
 	@SuppressWarnings("unchecked")
 	public void choice(Instr instr) {
 		Stack<Instr> code = (Stack<Instr>) getCode().clone();
 		code.push(instr);
-		fails.push(new Fail(succ, getGrammar(), code, getEnv(), (Stack<Value>) values.clone(), getText(), getTextPtr(), getIndent()));
+		fails.push(
+				new Fail(succ, getGrammar(), code, getEnv(), (Stack<Value>) values.clone(), (Stack<Integer>) getLines().clone(), getText(), getTextPtr(), getIndent()));
 	}
 
 	public void cut() {
@@ -88,6 +90,7 @@ public class Machine extends Context {
 			setCode((Stack<Instr>) fail.getCode().clone());
 			setEnv(fail.getEnv());
 			setValues(fail.getValues());
+			setLines(fail.getLines());
 			setText(fail.getText());
 			setTextPtr(fail.getTextPtr());
 			setIndent(fail.getIndent());
@@ -234,7 +237,7 @@ public class Machine extends Context {
 	public void skipLine() {
 		while (!EOF() && peek() != 10)
 			consume();
-		while (peek() == 10 || peek() == 13)
+		while (!EOF() && (peek() == 10 || peek() == 13))
 			consume();
 	}
 
