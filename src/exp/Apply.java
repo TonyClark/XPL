@@ -84,24 +84,28 @@ public class Apply extends Exp {
 					try {
 						field.set(o, object);
 					} catch (IllegalArgumentException e) {
-						System.out.println("Error setting " + field + " to " + object);
+						System.err.println("Error setting " + field + " to " + object);
 					} catch (IllegalAccessException e) {
 						e.printStackTrace();
 					} catch (Exception x) {
-						System.out.println("The value " + object + ":" + object.getClass() + " is not of type " + type);
+						System.err.println("The value " + object + ":" + object.getClass() + " is not of type " + type);
 					}
 				} catch (SecurityException e1) {
 					e1.printStackTrace();
 				} catch (NoSuchFieldException e1) {
 					e1.printStackTrace();
 				} catch (Exception x) {
-					System.out.println("cannot set " + name + " to " + value);
+					System.err.println("cannot set " + name + " to " + value);
+					x.printStackTrace(System.err);
 				}
 			}
 		}
 		if (o instanceof Located) {
 			Located l = (Located) o;
-			if (l.getLine() == -1) l.setLine(context.getLine());
+			if (l.getLineStart() == -1) {
+				l.setLineStart(context.getLine());
+				l.setLineEnd(context.getTextPtr());
+			}
 		}
 		if (Value.class.isAssignableFrom(o.getClass()))
 			return (Value) o;

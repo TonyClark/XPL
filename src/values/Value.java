@@ -1,5 +1,6 @@
 package values;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -17,7 +18,7 @@ import exp.BoaConstructor;
 import exp.Exp;
 import xpl.XPL;
 
-public abstract class Value extends Printable {
+public abstract class Value extends Printable implements Serializable {
 
 	public static Env<String, Value> builtinEnv;
 

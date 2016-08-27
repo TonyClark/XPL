@@ -1,5 +1,12 @@
 package exp;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Stack;
 
 import context.Context;
@@ -49,9 +56,55 @@ public class Import extends Exp {
 	}
 
 	public static Record getFile(String name) {
+		if (name.endsWith(".xpl")) {
+			String prefix = name.substring(0, name.length() - 4);
+			File sourceFile = new File(name);
+			File objectFile = new File(prefix + ".o");
+			if (!objectFile.exists() || sourceFile.lastModified() > objectFile.lastModified()) {
+				// We need to create the object file....
+				Record record = getSourceFile(name);
+				try {
+					FileOutputStream fout = new FileOutputStream(objectFile);
+					ObjectOutputStream out = new ObjectOutputStream(fout);
+					out.writeObject(record);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return record;
+			} else {
+				return getObjectFile(prefix + ".o");
+			}
+		} else return getSourceFile(name);
+	}
+
+	private static Record getObjectFile(String name) {
+		File file = new File(name);
+		try {
+			FileInputStream fin = new FileInputStream(file);
+			ObjectInputStream in = new ObjectInputStream(fin);
+			System.out.print("[" + name);
+			Object o = in.readObject();
+			System.out.println(" ]");
+			return (Record) o;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private static Record getSourceFile(String name) {
 		Machine machine = new Machine(null, Value.builtinEnv, new Stack<Integer>(), Context.readFile(name), 0, null, 0);
 		Grammar grammar = (Grammar) XPL.XPL;
 		machine.setGrammar(grammar);
+		// grammar.setDebug(true);
 		machine.pushInstr(new Call("file", new Apply("exp.BindingNameLiteral", new Str(name))));
 		long start = System.currentTimeMillis();
 		System.out.print("[" + name);

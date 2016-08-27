@@ -2,8 +2,12 @@ package values;
 
 public interface Located {
 
-	public int getLine();
+	public int getLineStart();
 
-	public void setLine(int linePos);
+	public int getLineEnd();
+
+	public void setLineStart(int linePos);
+
+	public void setLineEnd(int linePos);
 
 }

@@ -48,7 +48,10 @@ public class Closure extends PTerm {
 			JavaObject jo = (JavaObject) v;
 			if (jo.getTarget() instanceof Located) {
 				Located l = (Located) jo.getTarget();
-				if (l.getLine() == -1) l.setLine(machine.getLine());
+				if (l.getLineStart() == -1) {
+					l.setLineStart(machine.getLine());
+					l.setLineEnd(machine.getTextPtr());
+				}
 			}
 		}
 		machine.pushValue(v);

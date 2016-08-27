@@ -1,10 +1,9 @@
 package env;
 
+import java.io.Serializable;
 import java.util.Vector;
 
-import values.Value;
-
-public abstract class Env<Key,Value> {
+public abstract class Env<Key,Value> implements Serializable {
 	
 	public abstract Value lookup(Key key);
 	

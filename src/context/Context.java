@@ -15,8 +15,8 @@ import values.Value;
 
 public class Context extends Value {
 
-	private static int						errPtr		= -1;
-	private static Vector<String>	errMsgs		= new Vector<String>();
+	private static int						errPtr	= -1;
+	private static Vector<String>	errMsgs	= new Vector<String>();
 
 	public static int getErrPtr() {
 		return errPtr;
@@ -112,7 +112,7 @@ public class Context extends Value {
 		if (context.nextNonWhitePos(textPtr) == errPtr) {
 			errPtr = context.textPtr;
 			boolean found = false;
-			for (String m : errMsgs)
+			for (String m : (Vector<String>) errMsgs.clone())
 				if (msg.equals(m)) found = true;
 			if (!found) errMsgs.add(msg);
 		}
@@ -141,7 +141,7 @@ public class Context extends Value {
 	}
 
 	public ParseError getError() {
-		return new ParseError(errMsgs,Math.min(errPtr, getText().length()),getText().getText());
+		return new ParseError(errMsgs, Math.min(errPtr, getText().length()), getText().getText());
 	}
 
 	public Grammar getGrammar() {
@@ -246,7 +246,7 @@ public class Context extends Value {
 	}
 
 	public void pushLinePos() {
-		lines.push(linePos());
+		lines.push(textPtr);
 	}
 
 	public void receive(Context other) {

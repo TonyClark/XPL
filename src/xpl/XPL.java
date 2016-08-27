@@ -119,7 +119,7 @@ public class XPL {
 			new Rule("FieldPattern",new Seq(new Bind("n",new Call("Name")),new Call("WhiteSpace"),new Term("="),new Bind("p",new Call("Pattern")),new Action(new Apply("patterns.Field",new Var("n"),new Var("p"))))),
 			new Rule("CnstrPattern",new Seq(new Bind("n",new Call("Name")),new Call("WhiteSpace"),new Term("("),new Bind("ps",new Call("Patterns")),new Call("WhiteSpace"),new Term(")"),new Action(new Apply("patterns.Cnstr",new Var("n"),new Var("ps"))))),
 			new Rule("KeyWord",new Seq(new Call("Key"),new Not(new Or(new Range('a','z'),new Range('A','Z'))))),
-			new Rule("Key",new Or(new Term("EOF"),new Term("thunk"),new Term("not"),new Term("and"),new Term("or"),new Term("when"),new Term("case"),new Term("module"),new Term("export"),new Term("import"),new Term("true"),new Term("false"),new Term("fun"),new Term("let"),new Term("in"),new Term("reify"),new Term("letrec"),new Term("if"),new Term("then"),new Term("else"))),
+			new Rule("Key",new Or(new Term("EOF"),new Term("SKIPWHITE"),new Term("thunk"),new Term("not"),new Term("and"),new Term("or"),new Term("when"),new Term("case"),new Term("module"),new Term("export"),new Term("import"),new Term("true"),new Term("false"),new Term("fun"),new Term("let"),new Term("in"),new Term("reify"),new Term("letrec"),new Term("if"),new Term("then"),new Term("else"))),
 			new Rule("Name",new Seq(new Call("WhiteSpace"),new Not(new Call("KeyWord")),new Bind("c",new Call("AlphaChar")),new Bind("chars",new Star(new Or(new Call("AlphaChar"),new Call("NumChar")))),new Action(new Apply("values.Str",new Cons(new Var("c"),new Var("chars")))))));
 	
 	public static Grammar Grammar = new Grammar("Grammar",
@@ -135,7 +135,7 @@ public class XPL {
 			new Rule("Repeat",new DisjointCalls("Star","Plus","PAtom")),
 			new Rule("Star",new Seq(new Bind("a",new Call("PAtom")),new Term("*"),new Action(new Apply("grammar.Star",new Var("a"))))),
 			new Rule("Plus",new Seq(new Bind("a",new Call("PAtom")),new Term("+"),new Action(new Apply("grammar.Plus",new Var("a"))))),
-			new Rule("PAtom",new Or(new Call("EndOfInput"),new Call("Cut"),new Call("Pred"),new Call("CharCode"),new Call("PDelay"),new Call("LDelay"),new Call("Not"),new Call("Call"),new Call("ECall"),new Call("Term"),new Call("Range"), new Call("Dot"), new Call("Action"),new Seq(new Term("("),new Bind("a",new Call("PTerm")),new Term(")"),new Action(new Var("a"))))),
+			new Rule("PAtom",new Or(new Call("EndOfInput"),new Call("Cut"),new Call("Pred"),new Call("CharCode"),new Call("PDelay"),new Call("LDelay"),new Call("Skipper"),new Call("Not"),new Call("Call"),new Call("ECall"),new Call("Term"),new Call("Range"), new Call("Dot"), new Call("Action"),new Seq(new Term("("),new Bind("a",new Call("PTerm")),new Term(")"),new Action(new Var("a"))))),
 			new Rule("Cut",new Seq(new Term("!"),new Action(new Apply("grammar.Cut")))),
 			new Rule("PDelay",new Seq(new Term("PDELAY"),new Term("("),new Bind("start",new Call("String")),new Term(","),new Bind("end",new Call("String")),new Term(","),new Bind("g",new Call("Exp")),new Term(")"),new Action(new Apply("grammar.PDelay",new Var("start"),new Var("end"),new Var("g"))))),
 			new Rule("LDelay",new Seq(new Term("LDELAY"),new Term("("),new Bind("start",new Call("String")),new Term(","),new Bind("end",new Call("String")),new Term(","),new Bind("g",new Call("Exp")),new Term(")"),new Action(new Apply("grammar.LDelay",new Var("start"),new Var("end"),new Var("g"))))),
@@ -148,6 +148,7 @@ public class XPL {
 			new Rule("Dot",new Seq(new Term("."),new Action(new Apply("grammar.Dot")))),
 			new Rule("Pred",new Seq(new Call("WhiteSpace"),new Term("?"),new Bind("n",new Call("Atom")),new Term("("),new Bind("as",new Call("Args")),new Term(")"),new Action(new Apply("grammar.Predicate",new Var("n"),new Var("as"))))),
 			new Rule("Not",new Seq(new Call("WhiteSpace"),new Term("not"),new Term("("),new Bind("t",new Call("PTerm")),new Term(")"),new Action(new Apply("grammar.Not",new Var("t"))))),
+			new Rule("Skipper",new Seq(new Term("SKIPWHITE"),new Term("("),new Bind("t1",new Call("String")),new Term(","),new Bind("t2",new Call("String")),new Term(","),new Bind("t3",new Call("String")),new Term(")"),new Action(new Apply("grammar.SkipWhite",new Var("t1"),new Var("t2"),new Var("t3"))))),
 			new Rule("Char",new Or(new Call("CharLiteral"),new Call("CharCode"))),
 			new Rule("CharCode",new Seq(new Bind("c",new Call("Int")),new Action(new Apply("grammar.Char",new Var("c"))))),
 			new Rule("CharLiteral",new Seq(new Char('\''),new Bind("x",new Dot()),new Char('\''),new Action(new Apply("grammar.Char",new Var("x"))))),
