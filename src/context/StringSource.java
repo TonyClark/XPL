@@ -1,10 +1,12 @@
 package context;
 
-import values.Printable;
+import java.io.Serializable;
+
 import exp.BoaConstructor;
+import values.Printable;
 
 @BoaConstructor(fields = { "str" })
-public class StringSource extends Printable implements CharSource {
+public class StringSource extends Printable implements CharSource, Serializable {
 
 	public String	str;
 
