@@ -3,7 +3,7 @@ export xplBase, XPL, test
 xplBase(exp,extension) = { 
   root            -> x=letExp ! {x} | x=letrecExp ! {x} | x=ifExp ! {x} | x=internExp ! {x} | x=funExp ! {x} | x=bool ! {x} | x=comment ! {x};
   file(name)      -> ds=(m=moduleDef ! {m})* EOF {'modules.ModuleBinding'(name,ds)};
-  whitespace      -> (32 | 10 | 13 | 9)* !;
+  whitespace      -> SKIPWHITE('//','/*','*/');
   comment         -> '//' (not(10) .)*;
   topLevelCommand -> whitespace d=command ';' {d};
   command         -> x=toplvlQuit ! {x} | x=tplvlExp ! {x} | x=tplvlImport ! {x} | x=tplvlBind ! {x};
@@ -98,7 +98,7 @@ xplBase(exp,extension) = {
   fieldPattern      -> n=name whitespace '=' p=Pattern {'patterns.Field'(n,p)};
   cnstrPattern      -> n=name whitespace '(' ps=patterns whitespace ')' {'patterns.Cnstr'(n,ps)};
   keyWord           -> key not([97,122] | [65,90]);
-  key               -> 'EOF' | 'thunk' | 'not' | 'and' | 'or' | 'when' | 'case' | 'module' | 'export' | 'import' | 'true' | 'false' | 'fun' | 'let' | 'in' | 'letrec' | 'if' | 'then' | 'else' | 'SKIPWHITE';
+  key               -> ('EOF' | 'thunk' | 'not' | 'and' | 'or' | 'when' | 'case' | 'module' | 'export' | 'import' | 'true' | 'false' | 'fun' | 'let' | 'in' | 'letrec' | 'if' | 'then' | 'else' | 'SKIPWHITE')!;
   name              -> whitespace not(keyWord) c=alphaChar chars=(alphaChar | numChar)* ! {'values.Str'(c:chars)};
   grammar           -> '{' rs=rules '}' ! {'grammar.Grammar'('',rs)};
   rule              -> n=name as=ruleArgs '->' b=pTerm {'grammar.Rule'(n,['grammar.Body'(as,b)])};
