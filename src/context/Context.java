@@ -1,5 +1,6 @@
 package context;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,15 +23,18 @@ public class Context extends Value {
 		return errPtr;
 	}
 
-	public static CharSource readFile(String name) {
+	public static CharSource readFile1(String name) {
+		System.err.println("HERE 3");
 		String s = "";
 		try {
 			FileInputStream sin = new FileInputStream(name);
 			int i = 0;
 			while ((i = sin.read()) != -1) {
 				s = s + (char) i;
+				System.err.println(s.length());
 			}
 			sin.close();
+			System.err.println("HERE 4");
 		} catch (FileNotFoundException e) {
 			System.out.println("read file: " + name);
 			e.printStackTrace();
@@ -39,6 +43,36 @@ public class Context extends Value {
 			e.printStackTrace();
 		}
 		return new StringSource(s);
+	}
+
+	public static CharSource readFile(String name) {
+		File file = new File(name);
+		byte[] b = new byte[(int) file.length()];
+		int len = b.length;
+		int total = 0;
+
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream(name);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		while (total < len) {
+			int result = 0;
+			try {
+				result = in.read(b, total, len - total);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (result == -1) {
+				break;
+			}
+			total += result;
+		}
+
+		return new StringSource(new String(b));
 	}
 
 	public static void reset() {

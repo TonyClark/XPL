@@ -77,7 +77,7 @@ public class Interpreter {
 		// Call this to read a file in a given language. It assumes that XPL needs
 		// to be read first, then the grammar for the language and then the file...
 		Grammar grammar = getGrammar(languagePath, languageName);
-		// grammar.setDebug(true);
+		// rammar.setDebug(true);
 		return parseCharSource(filePath, grammar, startNT, Context.readFile(filePath), args, true);
 	}
 
