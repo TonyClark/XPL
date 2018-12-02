@@ -1,12 +1,14 @@
 package grammar;
 
 import java.util.HashSet;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import context.TerminalSet;
 import env.Env;
 import exp.BoaConstructor;
+import grammar.simple.SimplifiedPTerm;
 import machine.Machine;
 import values.Value;
 
@@ -37,7 +39,7 @@ public class Regexp extends PTerm {
     if (pattern == null) pattern = Pattern.compile(exp);
     Matcher matcher = pattern.matcher(machine.getText().getText());
     matcher = matcher.region(machine.getTextPtr(), machine.getText().length());
-    if (matcher.find()) { 
+    if (matcher.find()) {
       String s = matcher.group(0);
       machine.setTextPtr(machine.getTextPtr() + s.length());
       machine.pushValue(new values.Str(s));
@@ -51,8 +53,8 @@ public class Regexp extends PTerm {
     return "REGEXP('" + exp + "')";
   }
 
-  private static boolean needsProtection(char c) {
-    return false;
+  public Vector<Vector<SimplifiedPTerm>> simplify() {
+    throw new Error("simplification error: canno simplify a regular expression.");
   }
 
 }

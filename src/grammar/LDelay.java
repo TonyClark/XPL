@@ -12,24 +12,23 @@ public class LDelay extends PDelay {
   }
 
   public LDelay(String start, String end, Exp grammar) {
-	super(start, end, grammar);
+    super(start, end, grammar);
   }
 
   public void exec(Machine machine) {
-	machine.skipWhiteSpace();
-	if (machine.hasPrefix(start)) {
-	  String s = getText(machine);
-	  Exp g = (Exp) grammar.eval(machine);
-	  machine.pushValue(new LClosure(s, g));
-	} else {
-	  machine.error(machine, "expecting " + start);
-	  machine.fail(false);
-	}
-
+    machine.skipWhiteSpace();
+    if (machine.hasPrefix(start)) {
+      String s = getText(machine);
+      Exp g = (Exp) grammar.eval(machine);
+      machine.pushValue(new LClosure(s, g));
+    } else {
+      machine.error(machine, "expecting " + start);
+      machine.fail(false);
+    }
   }
 
   public String pprint(int opPrec) {
-	return "LDELAY('" + start + "','" + end + "'," + grammar.pprint(Exp.MAXOP) + ")";
+    return "LDELAY('" + start + "','" + end + "'," + grammar.pprint(Exp.MAXOP) + ")";
   }
 
 }

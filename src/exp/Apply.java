@@ -95,7 +95,7 @@ public class Apply extends Exp {
 				} catch (NoSuchFieldException e1) {
 					e1.printStackTrace();
 				} catch (Exception x) {
-					System.err.println("cannot set " + name + " to " + value);
+					System.err.println(c + ": cannot set " + name + " to " + value);
 					x.printStackTrace(System.err);
 				}
 			}

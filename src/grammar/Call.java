@@ -2,6 +2,7 @@ package grammar;
 
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Vector;
 
 import machine.Machine;
 import values.Thunk;
@@ -11,6 +12,7 @@ import context.TerminalSet;
 import env.Env;
 import exp.BoaConstructor;
 import exp.Exp;
+import grammar.simple.SimplifiedPTerm;
 
 @BoaConstructor(fields = { "name", "args" })
 public class Call extends PTerm {
@@ -80,7 +82,7 @@ public class Call extends PTerm {
     }
   }
 
-  public void exec(Machine machine) {
+  public void exec(Machine machine) { 
     if (hasRule(machine)) {
       Value[] values = new Value[args.length];
       for (int i = 0; i < args.length; i++)
@@ -109,6 +111,10 @@ public class Call extends PTerm {
       }
       return s + ")";
     }
+  }
+
+  public Vector<Vector<SimplifiedPTerm>> simplify() {
+    return SimplifiedPTerm.call(name);
   }
 
 }
